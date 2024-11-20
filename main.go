@@ -24,7 +24,7 @@ func main() {
 
 	if cfg.Log == nil {
 		cfg.Log.Delay = 2
-		cfg.Log.Path = "./log/analysis"
+		cfg.Log.Path = "./log/market"
 	}
 
 	LOG := xlog.NewXLogger().BuildOutType(xlog.FILE).BuildLevel(xlog.InfoLevel).BuildFormatter(xlog.FORMAT_JSON).BuildFile(cfg.Log.Path, 24*time.Hour)
@@ -38,10 +38,14 @@ func main() {
 	root.Use(gin.LoggerWithConfig(gin.LoggerConfig{Output: LOG.Out}))
 
 	srv := server.NewHandler(cfg.DB, LOG)
-	root.POST("/monitor", srv.Monitor)
-	root.POST("/query", srv.QueryTxs)
-	root.POST("/analysis/income", srv.Income)
-	root.POST("/analysis/pay", srv.Pay)
+	root.GET("/coin/list", srv.GetCoinList)
+	root.GET("/coin/info", srv.GetCoinInfo)
+	root.GET("/coin/fullCoin", srv.GetCoin)
+	root.POST("/history/create", srv.SubmitTxHistory)
+	root.GET("/history/query", srv.GetTxHistory)
+	root.POST("/user/create", srv.SubmitUser)
+	root.GET("/user/query", srv.GetUser)
+	root.POST("/user/update", srv.UpdateUser)
 
 	err := e.Run(fmt.Sprintf(":%v", cfg.Port))
 	if err != nil {

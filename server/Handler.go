@@ -39,7 +39,7 @@ func NewHandler(cfg *config.DB, log *xlog.XLog) *Handler {
 	}
 }
 
-func (h *Handler) Monitor(ctx *gin.Context) {
+func (h *Handler) GetCoinList(ctx *gin.Context) {
 	b, err := io.ReadAll(ctx.Request.Body)
 	if err != nil {
 		h.Error(ctx, "", ctx.Request.RequestURI, err.Error())
@@ -71,7 +71,7 @@ func (h *Handler) Monitor(ctx *gin.Context) {
 	h.Success(ctx, string(b), nil, ctx.Request.RequestURI)
 }
 
-func (h *Handler) QueryTxs(ctx *gin.Context) {
+func (h *Handler) GetCoin(ctx *gin.Context) {
 	b, err := io.ReadAll(ctx.Request.Body)
 	if err != nil {
 		h.Error(ctx, "", ctx.Request.RequestURI, err.Error())
@@ -83,7 +83,55 @@ func (h *Handler) QueryTxs(ctx *gin.Context) {
 	h.Success(ctx, string(b), mp, ctx.Request.RequestURI)
 }
 
-func (h *Handler) Income(ctx *gin.Context) {
+func (h *Handler) GetCoinInfo(ctx *gin.Context) {
+	b, err := io.ReadAll(ctx.Request.Body)
+	if err != nil {
+		h.Error(ctx, "", ctx.Request.RequestURI, err.Error())
+		return
+	}
+
+	mp := make(map[string]any, 2)
+
+	h.Success(ctx, string(b), mp, ctx.Request.RequestURI)
+}
+
+func (h *Handler) GetTxHistory(ctx *gin.Context) {
+	b, err := io.ReadAll(ctx.Request.Body)
+	if err != nil {
+		h.Error(ctx, "", ctx.Request.RequestURI, err.Error())
+		return
+	}
+
+	mp := make(map[string]any, 2)
+
+	h.Success(ctx, string(b), mp, ctx.Request.RequestURI)
+}
+
+func (h *Handler) SubmitTxHistory(ctx *gin.Context) {
+	b, err := io.ReadAll(ctx.Request.Body)
+	if err != nil {
+		h.Error(ctx, "", ctx.Request.RequestURI, err.Error())
+		return
+	}
+
+	mp := make(map[string]any, 2)
+
+	h.Success(ctx, string(b), mp, ctx.Request.RequestURI)
+}
+
+func (h *Handler) SubmitUser(ctx *gin.Context) {
+	b, err := io.ReadAll(ctx.Request.Body)
+	if err != nil {
+		h.Error(ctx, "", ctx.Request.RequestURI, err.Error())
+		return
+	}
+
+	mp := make(map[string]any, 2)
+
+	h.Success(ctx, string(b), mp, ctx.Request.RequestURI)
+}
+
+func (h *Handler) GetUser(ctx *gin.Context) {
 	b, err := io.ReadAll(ctx.Request.Body)
 	if err != nil {
 		h.Error(ctx, "", ctx.Request.RequestURI, err.Error())
@@ -93,7 +141,7 @@ func (h *Handler) Income(ctx *gin.Context) {
 	h.Success(ctx, string(b), nil, ctx.Request.RequestURI)
 }
 
-func (h *Handler) Pay(ctx *gin.Context) {
+func (h *Handler) UpdateUser(ctx *gin.Context) {
 	b, err := io.ReadAll(ctx.Request.Body)
 	if err != nil {
 		h.Error(ctx, "", ctx.Request.RequestURI, err.Error())

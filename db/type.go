@@ -1,47 +1,64 @@
 package db
 
-import (
-	"time"
-)
+import "time"
 
-const (
-	TxFail            = 101
-	TxSuccess         = 100
-	DepositSuccess    = 2
-	Voting            = 3
-	VoteFail          = 4
-	VoteSuccess       = 5
-	MintSuccess       = 6
-	MintFail          = 7
-	TxTransferSuccess = 8
-	Locking           = 9
-	WithdrawFail      = 10
-)
-
-type Tx struct {
-	ID               int64     `json:"id" gorm:"column:id"`
-	TxID             string    `json:"tx_id" gorm:"column:tx_id"`
-	MintID           string    `json:"mint_id" gorm:"column:mint_id"`
-	CreatedAt        time.Time `json:"create_time" gorm:"column:create_time"`
-	UpdatedAt        time.Time `json:"update_time" gorm:"column:update_time"`
-	FromChainId      string    `json:"from_chain_id" gorm:"column:from_chain_id"`
-	ToChainId        string    `json:"to_chain_id" gorm:"column:to_chain_id"`
-	FromAddress      string    `json:"from_address" gorm:"column:from_address"`
-	ToAddress        string    `json:"to_address" gorm:"column:to_address"`
-	ReceiverAddress  string    `json:"receiver_address" gorm:"column:receiver_address"`
-	FromTokenAddress string    `json:"from_token_address" gorm:"column:from_token_address"`
-	ToTokenAddress   string    `json:"to_token_address" gorm:"column:to_token_address"`
-	Status           string    `json:"status" gorm:"column:status"`
-	RetryVote        int64     `json:"retry_vote" gorm:"column:retry_vote"`
-	RetryExec        int64     `json:"retry_exec" gorm:"column:retry_exec"`
-
-	BridgeId  string `json:"bridge_id" gorm:"column:bridge_id"`
-	ChannelId string `json:"channel_id" gorm:"column:channel_id"`
-	Timestamp string `json:"timestamp" gorm:"column:timestamp"`
-	Value     string `json:"value" gorm:"column:value"`
-	Fee       string `json:"fee" gorm:"column:fee"`
+type User struct {
+	Id          int64     `json:"id" gorm:"primary_key;auto_increment"`
+	Name        string    `json:"nickname" gorm:"column:nickname"`
+	Address     string    `json:"address" gorm:"column:address;unique"`
+	Role        int       `json:"role" gorm:"column:role;default:0" ` //1:vip,0:normal,2:ing
+	StakeTx     string    `json:"stakeTx" gorm:"column:stake_tx"`
+	StakeAmount string    `json:"stakeAmount" gorm:"column:stake_amount"`
+	ExpireTime  time.Time `json:"expireTime" gorm:"column:expire_time"`
+	CreateTime  time.Time `json:"createTime" gorm:"column:create_time"`
+	UpdateTime  time.Time `json:"updateTime" gorm:"column:update_time"`
 }
 
-func (receiver *Tx) TableName() string {
-	return "relay.tx"
+func (r *User) TableName() string {
+	return "table_user"
+}
+
+type RecommendCoin struct {
+	Id              int64     `json:"id" gorm:"primary_key;auto_increment"`
+	UUID            string    `json:"uuid"  gorm:"column:uuid;unique"`
+	Symbol          string    `json:"symbol" gorm:"column:symbol"`
+	Decimals        uint8     `json:"decimals" gorm:"column:decimals"`
+	TotalSupply     string    `json:"totalSupply" gorm:"column:total_supply"`
+	ContractAddress string    `json:"contractAddress" gorm:"column:contract_address"`
+	Index           int       `json:"index" gorm:"column:index"`
+	CoinInfo        *CoinInfo `json:"coinInfo" gorm:"column:-"`
+	ExpireTime      time.Time `json:"expireTime" gorm:"column:expire_time"`
+	CreateTime      time.Time `json:"createTime" gorm:"column:create_time"`
+	UpdateTime      time.Time `json:"updateTime" gorm:"column:update_time"`
+}
+
+func (r *RecommendCoin) TableName() string {
+	return "table_recommend_coin"
+}
+
+type CoinInfo struct {
+	Id     int64  `json:"id" gorm:"primary_key;auto_increment"`
+	UUID   string `json:"uuid"  gorm:"column:uuid;unique"`
+	Detail string `json:"detail" gorm:"column:detail"`
+}
+
+func (r *CoinInfo) TableName() string {
+	return "table_coin_info"
+}
+
+type TxHistory struct {
+	Id              int64     `json:"id" gorm:"primary_key;auto_increment"`
+	FromAddress     string    `json:"fromAddress" gorm:"column:from_address"`
+	ToAddress       string    `json:"toAddress" gorm:"column:to_Address"`
+	ContractAddress string    `json:"contractAddress" gorm:"column:contract_address"`
+	Amount          string    `json:"amount" gorm:"column:amount"`
+	TxId            string    `json:"txId" gorm:"column:tx_id"`
+	TxStatus        uint8     `json:"txStatus" gorm:"column:tx_status"` //1:交易成功，0:交易失败，2:交易进行中
+	TxInfo          string    `json:"txInfo" gorm:"column:tx_info"`
+	CreateTime      time.Time `json:"createTime" gorm:"column:create_time"`
+	UpdateTime      time.Time `json:"updateTime" gorm:"column:update_time"`
+}
+
+func (r *TxHistory) TableName() string {
+	return "table_tx_history"
 }

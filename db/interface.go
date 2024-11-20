@@ -1,17 +1,18 @@
 package db
 
-import "time"
+type DBInterface interface {
+	SubmitUser(u *User) error
+	UpdateUser(address string, m map[string]any) error
+	GetUser(address string) (*User, error)
 
-type Point struct {
-	Hour   string
-	Amount string
-}
-type TxManager interface {
-	QueryTx(id int64) (*Tx, error)
-	QueryTxs(start, end time.Time, status []int64) ([]*Tx, error)
-	QueryTxByFrom(from string, page, index int64) ([]*Tx, int64, error)
-	QueryTxByHash(bridgeId string) (*Tx, error)
+	NewRecommendCoin(rc *RecommendCoin) error
+	GetCoinList(currentPage int, pageSize int) ([]*RecommendCoin, int64, error)
 
-	AssetIncome(start, end time.Time) ([]*Point, error)
-	AssetPay(start, end time.Time) ([]*Point, error)
+	NewCoinInfo(ci *CoinInfo) error
+	GetCoinInfo(uuid string) (*CoinInfo, error)
+
+	GetCoinWithCoinInfo(address string) (*RecommendCoin, error)
+
+	NewTxHistory(tx *TxHistory) error
+	GetTxHistoryByAddress(address string) (*TxHistory, error)
 }
