@@ -1,15 +1,15 @@
 {
-  "Port": 9092,
+  "Port": 9091,
   "DB": {
-    "Addr": "190.92.213.101",
-    "Port": 5432,
-    "User": "postgres",
+    "Addr": "localhost",
+    "Port": 3306,
+    "User": "root",
     "Password": "123456789",
-    "DbName": "postgres"
+    "DbName": "ton-server"
   },
   "Log": {
-    "Path": "./log/analysis",
+    "Path": "./log/market",
     "Delay": 2
   },
-  "Root": "./bridge"
+  "Root": "./market"
 }

@@ -1,18 +1,30 @@
 version: "3.5"
 networks:
   default:
-    name: bridge-analysis
+    name: ton-server
 services:
-  analysis:
-    container_name: bridge-analysis
-    image: ghcr.io/qday-wallet/bridge-analysis:0.1.0
+  db:
+    container_name: db
+    image: mysql:8.0
     restart: always
     ports:
-      - 9092:9092
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456789
+      MYSQL_DATABASE: ton-server
+    volumes:
+      - ./data:/var/lib/mysql
+      - ./init:/docker-entrypoint-initdb.d
+  analysis:
+    container_name: ton-server
+    image: docker pull ghcr.io/ton-server/mm-market-server:0.1.0
+    restart: always
+    ports:
+      - 9091:9091
     volumes:
       - ./config.json:/app/config.json
       - ./log:/app/log
     command:
-      - /app/bridge-analysis
+      - /app/mm-market-server
       - --config
       - /app/config.json
