@@ -14,5 +14,5 @@ type DBInterface interface {
 	GetCoinWithCoinInfo(address string) (*RecommendCoin, error)
 
 	NewTxHistory(tx *TxHistory) error
-	GetTxHistoryByAddress(address string) (*TxHistory, error)
+	GetTxHistoryByAddress(address string) ([]*TxHistory, error)
 }

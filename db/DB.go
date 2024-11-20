@@ -1,6 +1,9 @@
 package db
 
 import (
+	"errors"
+	"time"
+
 	"github.com/sunjiangjun/xlog"
 	"gorm.io/gorm"
 )
@@ -10,54 +13,85 @@ type DB struct {
 	log  *xlog.XLog
 }
 
-func (D *DB) SubmitUser(u *User) error {
-	//TODO implement me
-	panic("implement me")
+func (db *DB) SubmitUser(u *User) error {
+	return db.core.Create(u).Error
 }
 
-func (D *DB) UpdateUser(address string, m map[string]any) error {
-	//TODO implement me
-	panic("implement me")
+func (db *DB) UpdateUser(address string, m map[string]any) error {
+	return db.core.Model(User{}).Where("address=?", address).Updates(m).Error
 }
 
-func (D *DB) GetUser(address string) (*User, error) {
-	//TODO implement me
-	panic("implement me")
+func (db *DB) GetUser(address string) (*User, error) {
+	var u User
+	err := db.core.Model(User{}).Where("address=?", address).First(&u).Error
+	if err != nil {
+		return nil, err
+	}
+	return &u, nil
 }
 
-func (D *DB) NewRecommendCoin(rc *RecommendCoin) error {
-	//TODO implement me
-	panic("implement me")
+func (db *DB) NewRecommendCoin(rc *RecommendCoin) error {
+	return db.core.Create(rc).Error
 }
 
-func (D *DB) GetCoinList(currentPage int, pageSize int) ([]*RecommendCoin, int64, error) {
-	//TODO implement me
-	panic("implement me")
+func (db *DB) GetCoinList(currentPage int, pageSize int) ([]*RecommendCoin, int64, error) {
+	if currentPage < 1 {
+		return nil, 0, errors.New("currentPage more then 1 always")
+	}
+
+	var total int64
+	err := db.core.Model(RecommendCoin{}).Where("expire_time>=?", time.Now().UTC()).Count(&total).Error
+	if err != nil {
+		return nil, 0, err
+	}
+
+	var list []*RecommendCoin
+	err = db.core.Model(RecommendCoin{}).Where("expire_time>=?", time.Now().UTC()).Order("`index` desc").Offset((currentPage - 1) * pageSize).Limit(pageSize).Scan(&list).Error
+	if err != nil {
+		return nil, 0, err
+	}
+	return list, total, nil
 }
 
-func (D *DB) NewCoinInfo(ci *CoinInfo) error {
-	//TODO implement me
-	panic("implement me")
+func (db *DB) NewCoinInfo(ci *CoinInfo) error {
+	return db.core.Create(ci).Error
 }
 
-func (D *DB) GetCoinInfo(uuid string) (*CoinInfo, error) {
-	//TODO implement me
-	panic("implement me")
+func (db *DB) GetCoinInfo(uuid string) (*CoinInfo, error) {
+	var c CoinInfo
+	err := db.core.Model(CoinInfo{}).Where("uuid=?", uuid).First(&c).Error
+	if err != nil {
+		return nil, err
+	}
+	return &c, nil
 }
 
-func (D *DB) GetCoinWithCoinInfo(address string) (*RecommendCoin, error) {
-	//TODO implement me
-	panic("implement me")
+func (db *DB) GetCoinWithCoinInfo(uuid string) (*RecommendCoin, error) {
+	var c RecommendCoin
+	err := db.core.Model(RecommendCoin{}).Where("uuid=?", uuid).First(&c).Error
+	if err != nil {
+		return nil, err
+	}
+
+	coinInfo, err := db.GetCoinInfo(uuid)
+	if err != nil {
+		return nil, err
+	}
+	c.CoinInfo = coinInfo
+	return &c, nil
 }
 
-func (D *DB) NewTxHistory(tx *TxHistory) error {
-	//TODO implement me
-	panic("implement me")
+func (db *DB) NewTxHistory(tx *TxHistory) error {
+	return db.core.Create(tx).Error
 }
 
-func (D *DB) GetTxHistoryByAddress(address string) (*TxHistory, error) {
-	//TODO implement me
-	panic("implement me")
+func (db *DB) GetTxHistoryByAddress(address string) ([]*TxHistory, error) {
+	var list []*TxHistory
+	err := db.core.Model(TxHistory{}).Where("from_address=? or to_address=?", address, address).Order("create_time desc").Limit(100).Scan(&list).Error
+	if err != nil {
+		return nil, err
+	}
+	return list, nil
 }
 
 func NewDB(db *gorm.DB, log *xlog.XLog) *DB {

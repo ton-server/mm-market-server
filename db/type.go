@@ -26,7 +26,7 @@ type RecommendCoin struct {
 	TotalSupply     string    `json:"totalSupply" gorm:"column:total_supply"`
 	ContractAddress string    `json:"contractAddress" gorm:"column:contract_address"`
 	Index           int       `json:"index" gorm:"column:index"`
-	CoinInfo        *CoinInfo `json:"coinInfo" gorm:"column:-"`
+	CoinInfo        *CoinInfo `json:"coinInfo" gorm:"-"`
 	ExpireTime      time.Time `json:"expireTime" gorm:"column:expire_time"`
 	CreateTime      time.Time `json:"createTime" gorm:"column:create_time"`
 	UpdateTime      time.Time `json:"updateTime" gorm:"column:update_time"`

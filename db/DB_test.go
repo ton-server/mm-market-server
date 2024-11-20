@@ -1,356 +1,138 @@
 package db
 
 import (
-	"reflect"
 	"testing"
+	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/sunjiangjun/xlog"
-	"gorm.io/gorm"
+	"github.com/ton-server/mm-market-server/common/driver"
 )
 
+func Init() *DB {
+	x := xlog.NewXLogger()
+	db, err := driver.Open("root", "123456789", "localhost", "ton-server", 3306, x)
+	if err != nil {
+		panic(err)
+	}
+	return NewDB(db, x)
+}
+
 func TestDB_GetCoinInfo(t *testing.T) {
-	type fields struct {
-		core *gorm.DB
-		log  *xlog.XLog
-	}
-	type args struct {
-		uuid string
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    *CoinInfo
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			D := &DB{
-				core: tt.fields.core,
-				log:  tt.fields.log,
-			}
-			got, err := D.GetCoinInfo(tt.args.uuid)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GetCoinInfo() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GetCoinInfo() got = %v, want %v", got, tt.want)
-			}
-		})
-	}
+	db := Init()
+	r, err := db.GetCoinInfo("456e7890-f12b-34c5-d678-890123456789")
+	assert.NoError(t, err)
+	assert.Equal(t, "456e7890-f12b-34c5-d678-890123456789", r.UUID)
 }
 
 func TestDB_GetCoinList(t *testing.T) {
-	type fields struct {
-		core *gorm.DB
-		log  *xlog.XLog
-	}
-	type args struct {
-		currentPage int
-		pageSize    int
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    []*RecommendCoin
-		want1   int64
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			D := &DB{
-				core: tt.fields.core,
-				log:  tt.fields.log,
-			}
-			got, got1, err := D.GetCoinList(tt.args.currentPage, tt.args.pageSize)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GetCoinList() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GetCoinList() got = %v, want %v", got, tt.want)
-			}
-			if got1 != tt.want1 {
-				t.Errorf("GetCoinList() got1 = %v, want %v", got1, tt.want1)
-			}
-		})
-	}
+	db := Init()
+	list, total, err := db.GetCoinList(1, 10)
+	assert.NoError(t, err)
+	assert.Equal(t, int64(1), total)
+	assert.Equal(t, list[0].UUID, "456e7890-f12b-34c5-d678-890123456789")
 }
 
 func TestDB_GetCoinWithCoinInfo(t *testing.T) {
-	type fields struct {
-		core *gorm.DB
-		log  *xlog.XLog
-	}
-	type args struct {
-		address string
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    *RecommendCoin
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			D := &DB{
-				core: tt.fields.core,
-				log:  tt.fields.log,
-			}
-			got, err := D.GetCoinWithCoinInfo(tt.args.address)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GetCoinWithCoinInfo() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GetCoinWithCoinInfo() got = %v, want %v", got, tt.want)
-			}
-		})
-	}
+	db := Init()
+	r, err := db.GetCoinWithCoinInfo("456e7890-f12b-34c5-d678-890123456789")
+	assert.NoError(t, err)
+	assert.Equal(t, "456e7890-f12b-34c5-d678-890123456789", r.UUID)
+	assert.Equal(t, "456e7890-f12b-34c5-d678-890123456789", r.CoinInfo.UUID)
 }
 
 func TestDB_GetTxHistoryByAddress(t *testing.T) {
-	type fields struct {
-		core *gorm.DB
-		log  *xlog.XLog
-	}
-	type args struct {
-		address string
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    *TxHistory
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			D := &DB{
-				core: tt.fields.core,
-				log:  tt.fields.log,
-			}
-			got, err := D.GetTxHistoryByAddress(tt.args.address)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GetTxHistoryByAddress() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GetTxHistoryByAddress() got = %v, want %v", got, tt.want)
-			}
-		})
-	}
+	db := Init()
+	list, err := db.GetTxHistoryByAddress("0xabcdef1234567890abcdef1234567890abcdef12")
+	assert.NoError(t, err)
+	assert.Equal(t, "0xabcdef1234567890abcdef1234567890abcdef12", list[0].FromAddress)
 }
 
 func TestDB_GetUser(t *testing.T) {
-	type fields struct {
-		core *gorm.DB
-		log  *xlog.XLog
-	}
-	type args struct {
-		address string
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    *User
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			D := &DB{
-				core: tt.fields.core,
-				log:  tt.fields.log,
-			}
-			got, err := D.GetUser(tt.args.address)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GetUser() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GetUser() got = %v, want %v", got, tt.want)
-			}
-		})
-	}
+	db := Init()
+	u, err := db.GetUser("0x1234567890abcdef")
+	assert.NoError(t, err)
+	assert.Equal(t, "0x1234567890abcdef", u.Address)
 }
 
 func TestDB_NewCoinInfo(t *testing.T) {
-	type fields struct {
-		core *gorm.DB
-		log  *xlog.XLog
+	coinInfo := CoinInfo{
+		Id:     1,
+		UUID:   "456e7890-f12b-34c5-d678-890123456789",
+		Detail: "This is a detailed description of the coin.",
 	}
-	type args struct {
-		ci *CoinInfo
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			D := &DB{
-				core: tt.fields.core,
-				log:  tt.fields.log,
-			}
-			if err := D.NewCoinInfo(tt.args.ci); (err != nil) != tt.wantErr {
-				t.Errorf("NewCoinInfo() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
+	db := Init()
+	err := db.NewCoinInfo(&coinInfo)
+	assert.NoError(t, err)
 }
 
 func TestDB_NewRecommendCoin(t *testing.T) {
-	type fields struct {
-		core *gorm.DB
-		log  *xlog.XLog
+	// 构建 CoinInfo 对象实例
+	coinInfo := &CoinInfo{
+		Id:     1,
+		UUID:   "456e7890-f12b-34c5-d678-890123456789",
+		Detail: "Detailed information about the coin.",
 	}
-	type args struct {
-		rc *RecommendCoin
+
+	// 构建 RecommendCoin 对象实例
+	recommendCoin := RecommendCoin{
+		Id:              1,
+		UUID:            "456e7890-f12b-34c5-d678-890123456789",
+		Symbol:          "COIN",
+		Decimals:        18,
+		TotalSupply:     "1000000000000000000",
+		ContractAddress: "0xabcdef1234567890abcdef1234567890abcdef12",
+		Index:           1,
+		CoinInfo:        coinInfo,
+		ExpireTime:      time.Now().Add(365 * 24 * time.Hour), // 1 年后过期
+		CreateTime:      time.Now(),
+		UpdateTime:      time.Now(),
 	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			D := &DB{
-				core: tt.fields.core,
-				log:  tt.fields.log,
-			}
-			if err := D.NewRecommendCoin(tt.args.rc); (err != nil) != tt.wantErr {
-				t.Errorf("NewRecommendCoin() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
+
+	db := Init()
+	err := db.NewRecommendCoin(&recommendCoin)
+	assert.NoError(t, err)
 }
 
 func TestDB_NewTxHistory(t *testing.T) {
-	type fields struct {
-		core *gorm.DB
-		log  *xlog.XLog
+	txHistory := TxHistory{
+		Id:              1,
+		FromAddress:     "0xabcdef1234567890abcdef1234567890abcdef12",
+		ToAddress:       "0x1234567890abcdef1234567890abcdef12345678",
+		ContractAddress: "0xcontract1234567890abcdef1234567890abcdef",
+		Amount:          "1000",
+		TxId:            "0xtransaction1234567890abcdef1234567890abcdef",
+		TxStatus:        1, // 成功
+		TxInfo:          "Transaction successful and confirmed.",
+		CreateTime:      time.Now(),
+		UpdateTime:      time.Now(),
 	}
-	type args struct {
-		tx *TxHistory
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			D := &DB{
-				core: tt.fields.core,
-				log:  tt.fields.log,
-			}
-			if err := D.NewTxHistory(tt.args.tx); (err != nil) != tt.wantErr {
-				t.Errorf("NewTxHistory() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
+	db := Init()
+	err := db.NewTxHistory(&txHistory)
+	assert.NoError(t, err)
+
 }
 
 func TestDB_SubmitUser(t *testing.T) {
-	type fields struct {
-		core *gorm.DB
-		log  *xlog.XLog
+	user := User{
+		Id:          1,
+		Name:        "Alice",
+		Address:     "0x1234567890abcdef",
+		Role:        1, // VIP
+		StakeTx:     "0xabcdef1234567890",
+		StakeAmount: "1000",
+		ExpireTime:  time.Now().Add(30 * 24 * time.Hour), // 30 天后过期
+		CreateTime:  time.Now(),
+		UpdateTime:  time.Now(),
 	}
-	type args struct {
-		u *User
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			D := &DB{
-				core: tt.fields.core,
-				log:  tt.fields.log,
-			}
-			if err := D.SubmitUser(tt.args.u); (err != nil) != tt.wantErr {
-				t.Errorf("SubmitUser() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
+
+	db := Init()
+	err := db.SubmitUser(&user)
+	assert.NoError(t, err)
 }
 
 func TestDB_UpdateUser(t *testing.T) {
-	type fields struct {
-		core *gorm.DB
-		log  *xlog.XLog
-	}
-	type args struct {
-		address string
-		m       map[string]any
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			D := &DB{
-				core: tt.fields.core,
-				log:  tt.fields.log,
-			}
-			if err := D.UpdateUser(tt.args.address, tt.args.m); (err != nil) != tt.wantErr {
-				t.Errorf("UpdateUser() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
-func TestNewDB(t *testing.T) {
-	type args struct {
-		db  *gorm.DB
-		log *xlog.XLog
-	}
-	tests := []struct {
-		name string
-		args args
-		want *DB
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := NewDB(tt.args.db, tt.args.log); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewDB() = %v, want %v", got, tt.want)
-			}
-		})
-	}
+	db := Init()
+	err := db.UpdateUser("0x1234567890abcdef", map[string]any{"role": 2})
+	assert.NoError(t, err)
 }
