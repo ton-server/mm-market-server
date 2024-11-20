@@ -1,10 +1,10 @@
 package server
 
 import (
-	"fmt"
+	"encoding/json"
 	"io"
+	"strconv"
 	"strings"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -40,71 +40,63 @@ func NewHandler(cfg *config.DB, log *xlog.XLog) *Handler {
 }
 
 func (h *Handler) GetCoinList(ctx *gin.Context) {
-	b, err := io.ReadAll(ctx.Request.Body)
+	currentPage := ctx.Query("currentPage")
+	page, err := strconv.Atoi(currentPage)
 	if err != nil {
 		h.Error(ctx, "", ctx.Request.RequestURI, err.Error())
 		return
 	}
-	startTime := gjson.ParseBytes(b).Get("startTime").String()
-	start, err := time.ParseInLocation(TimeFormat, startTime, time.UTC)
-	if err != nil {
-		h.Error(ctx, "", ctx.Request.RequestURI, err.Error())
-		return
-	}
-	endTime := gjson.ParseBytes(b).Get("endTime").String()
-	end, err := time.ParseInLocation(TimeFormat, endTime, time.UTC)
-	if err != nil {
-		h.Error(ctx, "", ctx.Request.RequestURI, err.Error())
-		return
-	}
-	end = end.Add(-60 * time.Minute)
-	if end.Before(start) {
-		h.Error(ctx, "", ctx.Request.RequestURI, fmt.Errorf("end time is before start time").Error())
-		return
-	}
-	//array := gjson.ParseBytes(b).Get("status").Array()
-	//list := make([]int64, 0, 2)
-	//for _, v := range array {
-	//	list = append(list, v.Int())
-	//}
 
-	h.Success(ctx, string(b), nil, ctx.Request.RequestURI)
+	pageSize := ctx.Query("pageSize")
+	size, err := strconv.Atoi(pageSize)
+	if err != nil {
+		h.Error(ctx, "", ctx.Request.RequestURI, err.Error())
+		return
+	}
+
+	list, total, err := h.db.GetCoinList(page, size)
+	if err != nil {
+		h.Error(ctx, "", ctx.Request.RequestURI, err.Error())
+		return
+	}
+
+	mp := make(map[string]any, 2)
+	mp["list"] = list
+	mp["total"] = total
+
+	h.Success(ctx, "", mp, ctx.Request.RequestURI)
 }
 
 func (h *Handler) GetCoin(ctx *gin.Context) {
-	b, err := io.ReadAll(ctx.Request.Body)
+	uuid := ctx.Query("uuid")
+	r, err := h.db.GetCoinWithCoinInfo(uuid)
 	if err != nil {
 		h.Error(ctx, "", ctx.Request.RequestURI, err.Error())
 		return
 	}
 
-	mp := make(map[string]any, 2)
-
-	h.Success(ctx, string(b), mp, ctx.Request.RequestURI)
+	h.Success(ctx, "", r, ctx.Request.RequestURI)
 }
 
 func (h *Handler) GetCoinInfo(ctx *gin.Context) {
-	b, err := io.ReadAll(ctx.Request.Body)
+	uuid := ctx.Query("uuid")
+	r, err := h.db.GetCoinInfo(uuid)
 	if err != nil {
 		h.Error(ctx, "", ctx.Request.RequestURI, err.Error())
 		return
 	}
 
-	mp := make(map[string]any, 2)
-
-	h.Success(ctx, string(b), mp, ctx.Request.RequestURI)
+	h.Success(ctx, "", r, ctx.Request.RequestURI)
 }
 
 func (h *Handler) GetTxHistory(ctx *gin.Context) {
-	b, err := io.ReadAll(ctx.Request.Body)
+	address := ctx.Query("address")
+	list, err := h.db.GetTxHistoryByAddress(address)
 	if err != nil {
 		h.Error(ctx, "", ctx.Request.RequestURI, err.Error())
 		return
 	}
-
-	mp := make(map[string]any, 2)
-
-	h.Success(ctx, string(b), mp, ctx.Request.RequestURI)
+	h.Success(ctx, "", list, ctx.Request.RequestURI)
 }
 
 func (h *Handler) SubmitTxHistory(ctx *gin.Context) {
@@ -114,9 +106,20 @@ func (h *Handler) SubmitTxHistory(ctx *gin.Context) {
 		return
 	}
 
-	mp := make(map[string]any, 2)
+	var tx db.TxHistory
+	err = json.Unmarshal(b, &tx)
+	if err != nil {
+		h.Error(ctx, string(b), ctx.Request.RequestURI, err.Error())
+		return
+	}
 
-	h.Success(ctx, string(b), mp, ctx.Request.RequestURI)
+	err = h.db.NewTxHistory(&tx)
+	if err != nil {
+		h.Error(ctx, string(b), ctx.Request.RequestURI, err.Error())
+		return
+	}
+
+	h.Success(ctx, string(b), nil, ctx.Request.RequestURI)
 }
 
 func (h *Handler) SubmitUser(ctx *gin.Context) {
@@ -126,19 +129,30 @@ func (h *Handler) SubmitUser(ctx *gin.Context) {
 		return
 	}
 
-	mp := make(map[string]any, 2)
-
-	h.Success(ctx, string(b), mp, ctx.Request.RequestURI)
-}
-
-func (h *Handler) GetUser(ctx *gin.Context) {
-	b, err := io.ReadAll(ctx.Request.Body)
+	var u db.User
+	err = json.Unmarshal(b, &u)
 	if err != nil {
-		h.Error(ctx, "", ctx.Request.RequestURI, err.Error())
+		h.Error(ctx, string(b), ctx.Request.RequestURI, err.Error())
+		return
+	}
+
+	err = h.db.SubmitUser(&u)
+	if err != nil {
+		h.Error(ctx, string(b), ctx.Request.RequestURI, err.Error())
 		return
 	}
 
 	h.Success(ctx, string(b), nil, ctx.Request.RequestURI)
+}
+
+func (h *Handler) GetUser(ctx *gin.Context) {
+	address := ctx.Query("address")
+	u, err := h.db.GetUser(address)
+	if err != nil {
+		h.Error(ctx, "", ctx.Request.RequestURI, err.Error())
+		return
+	}
+	h.Success(ctx, "", u, ctx.Request.RequestURI)
 }
 
 func (h *Handler) UpdateUser(ctx *gin.Context) {
@@ -148,6 +162,18 @@ func (h *Handler) UpdateUser(ctx *gin.Context) {
 		return
 	}
 
+	root := gjson.ParseBytes(b)
+
+	address := root.Get("address").String()
+	role := root.Get("role").Int()
+
+	m := make(map[string]any, 1)
+	m["role"] = role
+	err = h.db.UpdateUser(address, m)
+	if err != nil {
+		h.Error(ctx, string(b), ctx.Request.RequestURI, err.Error())
+		return
+	}
 	h.Success(ctx, string(b), nil, ctx.Request.RequestURI)
 }
 
