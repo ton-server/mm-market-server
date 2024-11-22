@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 	"github.com/sunjiangjun/xlog"
 	"github.com/tidwall/gjson"
@@ -114,6 +115,32 @@ func (h *Handler) SubmitTxHistory(ctx *gin.Context) {
 	}
 
 	err = h.db.NewTxHistory(&tx)
+	if err != nil {
+		h.Error(ctx, string(b), ctx.Request.RequestURI, err.Error())
+		return
+	}
+
+	h.Success(ctx, string(b), nil, ctx.Request.RequestURI)
+}
+
+func (h *Handler) SubmitCoin(ctx *gin.Context) {
+	b, err := io.ReadAll(ctx.Request.Body)
+	if err != nil {
+		h.Error(ctx, "", ctx.Request.RequestURI, err.Error())
+		return
+	}
+
+	var rc db.RecommendCoin
+	err = json.Unmarshal(b, &rc)
+	if err != nil {
+		h.Error(ctx, string(b), ctx.Request.RequestURI, err.Error())
+		return
+	}
+
+	uid := uuid.NewString()
+	rc.UUID = uid
+	rc.CoinInfo.UUID = uid
+	err = h.db.NewRecommendCoinAndCoinInfo(&rc)
 	if err != nil {
 		h.Error(ctx, string(b), ctx.Request.RequestURI, err.Error())
 		return

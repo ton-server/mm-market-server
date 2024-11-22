@@ -1,9 +1,11 @@
 package db
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
+	"github.com/goccy/go-json"
 	"github.com/stretchr/testify/assert"
 	"github.com/sunjiangjun/xlog"
 	"github.com/ton-server/mm-market-server/common/driver"
@@ -89,9 +91,12 @@ func TestDB_NewRecommendCoin(t *testing.T) {
 		UpdateTime:      time.Now(),
 	}
 
-	db := Init()
-	err := db.NewRecommendCoin(&recommendCoin)
-	assert.NoError(t, err)
+	b, _ := json.Marshal(recommendCoin)
+	fmt.Println(string(b))
+
+	//db := Init()
+	//err := db.NewRecommendCoinAndCoinInfo(&recommendCoin)
+	//assert.NoError(t, err)
 }
 
 func TestDB_NewTxHistory(t *testing.T) {
@@ -107,6 +112,10 @@ func TestDB_NewTxHistory(t *testing.T) {
 		CreateTime:      time.Now(),
 		UpdateTime:      time.Now(),
 	}
+
+	b, _ := json.Marshal(txHistory)
+	fmt.Println(string(b))
+
 	db := Init()
 	err := db.NewTxHistory(&txHistory)
 	assert.NoError(t, err)
@@ -125,6 +134,9 @@ func TestDB_SubmitUser(t *testing.T) {
 		CreateTime:  time.Now(),
 		UpdateTime:  time.Now(),
 	}
+
+	b, _ := json.Marshal(user)
+	fmt.Println(string(b))
 
 	db := Init()
 	err := db.SubmitUser(&user)

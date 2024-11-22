@@ -6,6 +6,7 @@ type DBInterface interface {
 	GetUser(address string) (*User, error)
 
 	NewRecommendCoin(rc *RecommendCoin) error
+	NewRecommendCoinAndCoinInfo(rc *RecommendCoin) error
 	GetCoinList(currentPage int, pageSize int) ([]*RecommendCoin, int64, error)
 
 	NewCoinInfo(ci *CoinInfo) error

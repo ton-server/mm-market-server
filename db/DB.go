@@ -14,7 +14,7 @@ type DB struct {
 }
 
 func (db *DB) SubmitUser(u *User) error {
-	return db.core.Create(u).Error
+	return db.core.Omit("id", "create_time", "update_time").Create(u).Error
 }
 
 func (db *DB) UpdateUser(address string, m map[string]any) error {
@@ -31,7 +31,19 @@ func (db *DB) GetUser(address string) (*User, error) {
 }
 
 func (db *DB) NewRecommendCoin(rc *RecommendCoin) error {
-	return db.core.Create(rc).Error
+	return db.core.Omit("id", "create_time", "update_time").Create(rc).Error
+}
+
+func (db *DB) NewRecommendCoinAndCoinInfo(rc *RecommendCoin) error {
+	err := db.NewCoinInfo(rc.CoinInfo)
+	if err != nil {
+		return err
+	}
+	err = db.NewRecommendCoin(rc)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (db *DB) GetCoinList(currentPage int, pageSize int) ([]*RecommendCoin, int64, error) {
@@ -54,7 +66,7 @@ func (db *DB) GetCoinList(currentPage int, pageSize int) ([]*RecommendCoin, int6
 }
 
 func (db *DB) NewCoinInfo(ci *CoinInfo) error {
-	return db.core.Create(ci).Error
+	return db.core.Omit("id", "create_time", "update_time").Create(ci).Error
 }
 
 func (db *DB) GetCoinInfo(uuid string) (*CoinInfo, error) {
@@ -82,7 +94,7 @@ func (db *DB) GetCoinWithCoinInfo(uuid string) (*RecommendCoin, error) {
 }
 
 func (db *DB) NewTxHistory(tx *TxHistory) error {
-	return db.core.Create(tx).Error
+	return db.core.Omit("id", "create_time", "update_time").Create(tx).Error
 }
 
 func (db *DB) GetTxHistoryByAddress(address string) ([]*TxHistory, error) {

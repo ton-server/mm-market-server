@@ -45,6 +45,7 @@ func main() {
 	root.GET("/coin/list", srv.GetCoinList)
 	root.GET("/coin/info", srv.GetCoinInfo)
 	root.GET("/coin/fullCoin", srv.GetCoin)
+	root.POST("coin/create", srv.SubmitCoin)
 	root.POST("/history/create", srv.SubmitTxHistory)
 	root.GET("/history/query", srv.GetTxHistory)
 	root.POST("/user/create", srv.SubmitUser)
