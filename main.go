@@ -29,10 +29,14 @@ func main() {
 
 	LOG := xlog.NewXLogger().BuildOutType(xlog.FILE).BuildLevel(xlog.InfoLevel).BuildFormatter(xlog.FORMAT_JSON).BuildFile(cfg.Log.Path, 24*time.Hour)
 
-	_, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
+	monitor := server.NewMonitor(cfg.DB, LOG, ctx)
+	go monitor.Start()
+
 	gin.SetMode(gin.ReleaseMode)
+
 	e := gin.New()
 	root := e.Group(cfg.Root)
 	root.Use(gin.LoggerWithConfig(gin.LoggerConfig{Output: LOG.Out}))
