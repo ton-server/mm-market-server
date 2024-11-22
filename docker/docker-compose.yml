@@ -15,9 +15,9 @@ services:
     volumes:
       - ./data:/var/lib/mysql
       - ./init:/docker-entrypoint-initdb.d
-  analysis:
+  market:
     container_name: ton-server
-    image: docker pull ghcr.io/ton-server/mm-market-server:0.1.0
+    image: ghcr.io/ton-server/mm-market-server:0.1.1
     restart: always
     ports:
       - 9091:9091

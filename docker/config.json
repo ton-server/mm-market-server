@@ -1,7 +1,7 @@
 {
   "Port": 9091,
   "DB": {
-    "Addr": "localhost",
+    "Addr": "190.92.213.101",
     "Port": 3306,
     "User": "root",
     "Password": "123456789",
