@@ -10,7 +10,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 	"github.com/sunjiangjun/xlog"
-	"github.com/tidwall/gjson"
 	"github.com/ton-server/mm-market-server/common/driver"
 	"github.com/ton-server/mm-market-server/config"
 	"github.com/ton-server/mm-market-server/db"
@@ -180,28 +179,6 @@ func (h *Handler) GetUser(ctx *gin.Context) {
 		return
 	}
 	h.Success(ctx, "", u, ctx.Request.RequestURI)
-}
-
-func (h *Handler) UpdateUser(ctx *gin.Context) {
-	b, err := io.ReadAll(ctx.Request.Body)
-	if err != nil {
-		h.Error(ctx, "", ctx.Request.RequestURI, err.Error())
-		return
-	}
-
-	root := gjson.ParseBytes(b)
-
-	address := root.Get("address").String()
-	role := root.Get("role").Int()
-
-	m := make(map[string]any, 1)
-	m["role"] = role
-	err = h.db.UpdateUser(address, m)
-	if err != nil {
-		h.Error(ctx, string(b), ctx.Request.RequestURI, err.Error())
-		return
-	}
-	h.Success(ctx, string(b), nil, ctx.Request.RequestURI)
 }
 
 const (

@@ -52,9 +52,9 @@ func TestDB_GetTxHistoryByAddress(t *testing.T) {
 
 func TestDB_GetUser(t *testing.T) {
 	db := Init()
-	u, err := db.GetUser("0x1234567890abcdef")
+	u, err := db.GetUser("0x1234567890abcdef2")
 	assert.NoError(t, err)
-	assert.Equal(t, "0x1234567890abcdef", u.Address)
+	assert.Equal(t, "0x1234567890abcdef2", u.Address)
 }
 
 func TestDB_NewCoinInfo(t *testing.T) {
@@ -145,6 +145,6 @@ func TestDB_SubmitUser(t *testing.T) {
 
 func TestDB_UpdateUser(t *testing.T) {
 	db := Init()
-	err := db.UpdateUser("0x1234567890abcdef", map[string]any{"role": 2})
+	err := db.UpdateUser("0x1234567890abcdef2", 2, "0xabcdef1234567890", "10000", time.Now().UTC().Add(1000*24*time.Hour))
 	assert.NoError(t, err)
 }

@@ -1,8 +1,10 @@
 package db
 
+import "time"
+
 type DBInterface interface {
 	SubmitUser(u *User) error
-	UpdateUser(address string, m map[string]any) error
+	UpdateUser(address string, role int, stakeTx string, stakeAmount string, expireTime time.Time) error
 	GetUser(address string) (*User, error)
 
 	NewRecommendCoin(rc *RecommendCoin) error

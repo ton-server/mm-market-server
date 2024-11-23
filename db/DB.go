@@ -14,10 +14,17 @@ type DB struct {
 }
 
 func (db *DB) SubmitUser(u *User) error {
+	u.ExpireTime = time.Now().UTC().Add(24 * time.Hour)
+	u.Name = ""
 	return db.core.Omit("id", "create_time", "update_time").Create(u).Error
 }
 
-func (db *DB) UpdateUser(address string, m map[string]any) error {
+func (db *DB) UpdateUser(address string, role int, stakeTx string, stakeAmount string, expireTime time.Time) error {
+	m := make(map[string]any, 4)
+	m["role"] = role
+	m["stake_tx"] = stakeTx
+	m["stake_amount"] = stakeAmount
+	m["expire_time"] = expireTime
 	return db.core.Model(User{}).Where("address=?", address).Updates(m).Error
 }
 
@@ -25,7 +32,15 @@ func (db *DB) GetUser(address string) (*User, error) {
 	var u User
 	err := db.core.Model(User{}).Where("address=?", address).First(&u).Error
 	if err != nil {
-		return nil, err
+		if err.Error() == "record not found" {
+			_ = db.SubmitUser(&User{Address: address})
+			err = db.core.Model(User{}).Where("address=?", address).First(&u).Error
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			return nil, err
+		}
 	}
 	return &u, nil
 }

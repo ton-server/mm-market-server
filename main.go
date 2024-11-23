@@ -48,9 +48,7 @@ func main() {
 	root.POST("coin/create", srv.SubmitCoin)
 	root.POST("/history/create", srv.SubmitTxHistory)
 	root.GET("/history/query", srv.GetTxHistory)
-	root.POST("/user/create", srv.SubmitUser)
-	root.GET("/user/query", srv.GetUser)
-	root.POST("/user/update", srv.UpdateUser)
+	root.GET("/user/queryAndCreate", srv.GetUser)
 
 	err := e.Run(fmt.Sprintf(":%v", cfg.Port))
 	if err != nil {
