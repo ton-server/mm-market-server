@@ -11,10 +11,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:9091/market/coin/list?currentPage=1&pageSize=1",
+					"raw": "http://190.92.213.101:9091/market/coin/list?currentPage=1&pageSize=1",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"190",
+						"92",
+						"213",
+						"101"
 					],
 					"port": "9091",
 					"path": [
@@ -42,10 +45,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:9091/market/coin/info?uuid=456e7890-f12b-34c5-d678-890123456789",
+					"raw": "http://190.92.213.101:9091/market/coin/info?uuid=627bb95a-14a3-4ce3-8dff-fd91dd25d708",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"190",
+						"92",
+						"213",
+						"101"
 					],
 					"port": "9091",
 					"path": [
@@ -56,7 +62,7 @@
 					"query": [
 						{
 							"key": "uuid",
-							"value": "456e7890-f12b-34c5-d678-890123456789"
+							"value": "627bb95a-14a3-4ce3-8dff-fd91dd25d708"
 						}
 					]
 				}
@@ -69,10 +75,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:9091/market/coin/fullCoin?uuid=456e7890-f12b-34c5-d678-890123456789",
+					"raw": "http://190.92.213.101:9091/market/coin/fullCoin?uuid=627bb95a-14a3-4ce3-8dff-fd91dd25d708",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"190",
+						"92",
+						"213",
+						"101"
 					],
 					"port": "9091",
 					"path": [
@@ -83,7 +92,7 @@
 					"query": [
 						{
 							"key": "uuid",
-							"value": "456e7890-f12b-34c5-d678-890123456789"
+							"value": "627bb95a-14a3-4ce3-8dff-fd91dd25d708"
 						}
 					]
 				}
@@ -96,10 +105,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:9091/market/history/query?address=0xabcdef1234567890abcdef1234567890abcdef12",
+					"raw": "http://190.92.213.101:9091/market/history/query?address=0xabcdef1234567890abcdef1234567890abcdef12",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"190",
+						"92",
+						"213",
+						"101"
 					],
 					"port": "9091",
 					"path": [
@@ -132,10 +144,13 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:9091/market/history/create",
+					"raw": "http://190.92.213.101:9091/market/history/create",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"190",
+						"92",
+						"213",
+						"101"
 					],
 					"port": "9091",
 					"path": [
@@ -148,111 +163,24 @@
 			"response": []
 		},
 		{
-			"name": "coin/create",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"symbol\": \"COIN\",\n    \"decimals\": 18,\n    \"totalSupply\": \"1000000000000000000\",\n    \"contractAddress\": \"0xabcdef1234567890abcdef1234567890abcdef12\",\n    \"index\": 1,\n    \"coinInfo\": {\n        \"detail\": \"Detailed information about the coin. json string\"\n    },\n    \"expireTime\": \"2025-11-22T23:16:35.221979+08:00\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:9091/market/coin/create",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "9091",
-					"path": [
-						"market",
-						"coin",
-						"create"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "user/create",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"nickname\": \"Alice\",\n    \"address\": \"0x1234567890abcdef1\",\n    \"role\": 1,\n    \"stakeTx\": \"0xabcdef1234567890\",\n    \"stakeAmount\": \"1000\",\n    \"expireTime\": \"2024-12-22T23:00:32.560896+08:00\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:9091/market/user/create",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "9091",
-					"path": [
-						"market",
-						"user",
-						"create"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "user/update",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\n    \"address\": \"0x1234567890abcdef1\",\n    \"role\": 2\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:9091/market/user/update",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "9091",
-					"path": [
-						"market",
-						"user",
-						"update"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "user/query",
+			"name": "user/queryAndCreate",
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:9091/market/user/query?address=0x1234567890abcdef",
+					"raw": "http://190.92.213.101:9091/market/user/queryAndCreate?address=0x1234567890abcdef",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"190",
+						"92",
+						"213",
+						"101"
 					],
 					"port": "9091",
 					"path": [
 						"market",
 						"user",
-						"query"
+						"queryAndCreate"
 					],
 					"query": [
 						{
