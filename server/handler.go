@@ -55,10 +55,13 @@ func (h *Handler) GetCoinList(ctx *gin.Context) {
 	}
 
 	fullCoin := ctx.Query("fullCoin")
-	full, err := strconv.Atoi(fullCoin)
-	if err != nil {
-		h.Error(ctx, "", ctx.Request.RequestURI, err.Error())
-		return
+	var full int = 0
+	if len(fullCoin) > 0 {
+		full, err = strconv.Atoi(fullCoin)
+		if err != nil {
+			h.Error(ctx, "", ctx.Request.RequestURI, err.Error())
+			return
+		}
 	}
 
 	list, total, err := h.db.GetCoinList(page, size, full == 1)

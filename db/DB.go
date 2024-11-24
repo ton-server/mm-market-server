@@ -78,12 +78,14 @@ func (db *DB) GetCoinList(currentPage int, pageSize int, full bool) ([]*Recommen
 		return nil, 0, err
 	}
 
-	for _, v := range list {
-		c, err := db.GetCoinInfo(v.UUID)
-		if err != nil {
-			continue
+	if full {
+		for _, v := range list {
+			c, err := db.GetCoinInfo(v.UUID)
+			if err != nil {
+				continue
+			}
+			v.CoinInfo = c
 		}
-		v.CoinInfo = c
 	}
 
 	return list, total, nil

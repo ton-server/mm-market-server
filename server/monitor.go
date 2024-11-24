@@ -6,7 +6,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/sirupsen/logrus"
 	"github.com/sunjiangjun/xlog"
@@ -45,20 +44,20 @@ func NewMonitor(cfg *config.DB, log *xlog.XLog, AdminAddress, TonHost string, ct
 }
 
 func (m *Monitor) Start() {
-	for {
-		<-time.After(20 * time.Second)
-		select {
-		case <-m.ctx.Done():
-			return
-		default:
-			m.loop2()
-		}
-	}
+	//for {
+	//	<-time.After(20 * time.Second)
+	//	select {
+	//	case <-m.ctx.Done():
+	//		return
+	//	default:
+	//		m.loop2()
+	//	}
+	//}
 }
 
 func (m *Monitor) loop2() {
 	url := "%v/getTransactions?address=%v&limit=50&to_lt=0&archival=false"
-	url = fmt.Sprintf(url, "https://toncenter.com/api/v2", m.TonHost, m.AdminAddress)
+	url = fmt.Sprintf(url, m.TonHost, m.AdminAddress)
 	resp, err := http.Get(url)
 	if err != nil {
 		return

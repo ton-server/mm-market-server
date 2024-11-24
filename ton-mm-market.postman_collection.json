@@ -11,7 +11,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://190.92.213.101:9091/market/coin/list?currentPage=1&pageSize=1",
+					"raw": "http://190.92.213.101:9091/market/coin/list?currentPage=1&pageSize=1&fullCoin=1",
 					"protocol": "http",
 					"host": [
 						"190",
@@ -32,6 +32,10 @@
 						},
 						{
 							"key": "pageSize",
+							"value": "1"
+						},
+						{
+							"key": "fullCoin",
 							"value": "1"
 						}
 					]
@@ -163,12 +167,12 @@
 			"response": []
 		},
 		{
-			"name": "user/queryAndCreate",
+			"name": "user/queryOrCreate",
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://190.92.213.101:9091/market/user/queryAndCreate?address=0x1234567890abcdef",
+					"raw": "http://190.92.213.101:9091/market/user/queryOrCreate?address=0x1234567890abcdef",
 					"protocol": "http",
 					"host": [
 						"190",
@@ -180,7 +184,7 @@
 					"path": [
 						"market",
 						"user",
-						"queryAndCreate"
+						"queryOrCreate"
 					],
 					"query": [
 						{
