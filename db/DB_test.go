@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/goccy/go-json"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/sunjiangjun/xlog"
 	"github.com/ton-server/mm-market-server/common/driver"
@@ -13,7 +14,7 @@ import (
 
 func Init() *DB {
 	x := xlog.NewXLogger()
-	db, err := driver.Open("root", "123456789", "localhost", "ton-server", 3306, x)
+	db, err := driver.Open("root", "123456789", "190.92.213.101", "ton-server", 3306, x)
 	if err != nil {
 		panic(err)
 	}
@@ -69,34 +70,41 @@ func TestDB_NewCoinInfo(t *testing.T) {
 }
 
 func TestDB_NewRecommendCoin(t *testing.T) {
+
+	uid := uuid.NewString()
+
+	mp := make(map[string]any)
+	mp["image"] = "https://cache.tonapi.io/imgproxy/8pvtFabCMkidoyjRHg38rHKpSTXkoL8R4urZOeKwq18/rs:fill:200:200:1/g:no/aHR0cHM6Ly9pLnBvc3RpbWcuY2MvTHM4d0Y0TVAvSU1HLTAwMjcucG5n.webp"
+	mp["description"] = "Welcome to the world of meme coin 'Durov, bring back the wall!' - for those who remember and love this legendary meme! This token has an issuance of 19,840,000 coins. The token was created by the community solely for your enjoyment and entertainment. Join us to relish the jokes and adventures associated with this fantastic meme. There is no purpose here except to bring a smile to your face and evoke positive emotions!"
+	mp["owner"] = "UQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJKZ"
+	mp["recommended reason"] = ""
+	mp["recommendation index"] = 97
+	bs, _ := json.Marshal(mp)
+
 	// 构建 CoinInfo 对象实例
 	coinInfo := &CoinInfo{
-		Id:     1,
-		UUID:   "456e7890-f12b-34c5-d678-890123456789",
-		Detail: "Detailed information about the coin.",
+		UUID:   uid,
+		Detail: string(bs),
 	}
 
 	// 构建 RecommendCoin 对象实例
 	recommendCoin := RecommendCoin{
-		Id:              1,
-		UUID:            "456e7890-f12b-34c5-d678-890123456789",
-		Symbol:          "COIN",
-		Decimals:        18,
-		TotalSupply:     "1000000000000000000",
-		ContractAddress: "0xabcdef1234567890abcdef1234567890abcdef12",
-		Index:           1,
+		UUID:            uid,
+		Symbol:          "WALL",
+		Decimals:        9,
+		TotalSupply:     "19839790",
+		ContractAddress: "EQDdCha_K-Z97lKl599O0GDAt0py2ZUuons4Wuf85tq6NXIO",
+		Index:           12,
 		CoinInfo:        coinInfo,
-		ExpireTime:      time.Now().Add(365 * 24 * time.Hour), // 1 年后过期
-		CreateTime:      time.Now(),
-		UpdateTime:      time.Now(),
+		ExpireTime:      time.Now().UTC().Add(365 * 24 * time.Hour), // 1 年后过期
 	}
 
 	b, _ := json.Marshal(recommendCoin)
 	fmt.Println(string(b))
 
-	//db := Init()
-	//err := db.NewRecommendCoinAndCoinInfo(&recommendCoin)
-	//assert.NoError(t, err)
+	db := Init()
+	err := db.NewRecommendCoinAndCoinInfo(&recommendCoin)
+	assert.NoError(t, err)
 }
 
 func TestDB_NewTxHistory(t *testing.T) {

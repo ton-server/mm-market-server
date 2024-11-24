@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -38,8 +39,10 @@ func main() {
 	gin.SetMode(gin.ReleaseMode)
 
 	e := gin.New()
+	e.Use(CORSMiddleware())
 	root := e.Group(cfg.Root)
 	root.Use(gin.LoggerWithConfig(gin.LoggerConfig{Output: LOG.Out}))
+	// 使用 CORS 中间件
 
 	srv := server.NewHandler(cfg.DB, LOG)
 	root.GET("/coin/list", srv.GetCoinList)
@@ -55,4 +58,22 @@ func main() {
 		panic(err)
 	}
 
+}
+
+func CORSMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*") // 设置允许的域名，`*` 表示允许所有
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		c.Writer.Header().Set("Access-Control-Expose-Headers", "Content-Length, Content-Type")
+		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true") // 允许凭据（cookies等）
+
+		// 对于 OPTIONS 请求，直接返回 200
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(http.StatusOK)
+			return
+		}
+
+		c.Next()
+	}
 }
