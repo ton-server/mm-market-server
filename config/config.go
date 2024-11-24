@@ -14,8 +14,10 @@ type DB struct {
 }
 
 type Config struct {
-	Root string `json:"Root" gorm:"column:Root"`
-	Log  *Log   `json:"Log" gorm:"column:Log"`
-	DB   *DB    `json:"DB" gorm:"column:DB"`
-	Port int    `json:"Port" gorm:"column:Port"`
+	AdminAddress string `json:"AdminAddress"`
+	TonHost      string `json:"TonHost"`
+	Root         string `json:"Root" gorm:"column:Root"`
+	Log          *Log   `json:"Log" gorm:"column:Log"`
+	DB           *DB    `json:"DB" gorm:"column:DB"`
+	Port         int    `json:"Port" gorm:"column:Port"`
 }

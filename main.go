@@ -32,7 +32,7 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	monitor := server.NewMonitor(cfg.DB, LOG, ctx)
+	monitor := server.NewMonitor(cfg.DB, LOG, cfg.AdminAddress, cfg.TonHost, ctx)
 	go monitor.Start()
 
 	gin.SetMode(gin.ReleaseMode)
