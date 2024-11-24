@@ -61,7 +61,7 @@ func (db *DB) NewRecommendCoinAndCoinInfo(rc *RecommendCoin) error {
 	return nil
 }
 
-func (db *DB) GetCoinList(currentPage int, pageSize int) ([]*RecommendCoin, int64, error) {
+func (db *DB) GetCoinList(currentPage int, pageSize int, full bool) ([]*RecommendCoin, int64, error) {
 	if currentPage < 1 {
 		return nil, 0, errors.New("currentPage more then 1 always")
 	}
@@ -77,6 +77,15 @@ func (db *DB) GetCoinList(currentPage int, pageSize int) ([]*RecommendCoin, int6
 	if err != nil {
 		return nil, 0, err
 	}
+
+	for _, v := range list {
+		c, err := db.GetCoinInfo(v.UUID)
+		if err != nil {
+			continue
+		}
+		v.CoinInfo = c
+	}
+
 	return list, total, nil
 }
 

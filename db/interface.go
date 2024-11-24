@@ -9,7 +9,7 @@ type DBInterface interface {
 
 	NewRecommendCoin(rc *RecommendCoin) error
 	NewRecommendCoinAndCoinInfo(rc *RecommendCoin) error
-	GetCoinList(currentPage int, pageSize int) ([]*RecommendCoin, int64, error)
+	GetCoinList(currentPage int, pageSize int, full bool) ([]*RecommendCoin, int64, error)
 
 	NewCoinInfo(ci *CoinInfo) error
 	GetCoinInfo(uuid string) (*CoinInfo, error)
