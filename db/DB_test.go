@@ -29,7 +29,7 @@ func TestDB_GetCoinInfo(t *testing.T) {
 
 func TestDB_GetCoinList(t *testing.T) {
 	db := Init()
-	list, total, err := db.GetCoinList(1, 10)
+	list, total, err := db.GetCoinList(1, 10, true)
 	assert.NoError(t, err)
 	assert.Equal(t, int64(1), total)
 	assert.Equal(t, list[0].UUID, "456e7890-f12b-34c5-d678-890123456789")

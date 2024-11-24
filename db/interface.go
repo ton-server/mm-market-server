@@ -6,6 +6,7 @@ type DBInterface interface {
 	SubmitUser(u *User) error
 	UpdateUser(address string, role int, stakeTx string, stakeAmount string, expireTime time.Time) error
 	GetUser(address string) (*User, error)
+	GetNormalUser() ([]*User, error)
 
 	NewRecommendCoin(rc *RecommendCoin) error
 	NewRecommendCoinAndCoinInfo(rc *RecommendCoin) error

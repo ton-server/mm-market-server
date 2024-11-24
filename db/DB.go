@@ -28,6 +28,15 @@ func (db *DB) UpdateUser(address string, role int, stakeTx string, stakeAmount s
 	return db.core.Model(User{}).Where("address=?", address).Updates(m).Error
 }
 
+func (db *DB) GetNormalUser() ([]*User, error) {
+	var list []*User
+	err := db.core.Model(User{}).Where("role=?", 0).Scan(&list).Error
+	if err != nil {
+		return nil, err
+	}
+	return list, nil
+}
+
 func (db *DB) GetUser(address string) (*User, error) {
 	var u User
 	err := db.core.Model(User{}).Where("address=?", address).First(&u).Error

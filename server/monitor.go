@@ -2,10 +2,13 @@ package server
 
 import (
 	"context"
+	"encoding/base64"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/sirupsen/logrus"
 	"github.com/sunjiangjun/xlog"
@@ -39,24 +42,43 @@ func NewMonitor(cfg *config.DB, log *xlog.XLog, AdminAddress, TonHost string, ct
 		ctx:          ctx,
 		AdminAddress: AdminAddress,
 		TonHost:      TonHost,
-		log:          log.WithField("module", "handler"),
+		log:          log.WithField("module", "monitor"),
 	}
 }
 
 func (m *Monitor) Start() {
-	//for {
-	//	<-time.After(20 * time.Second)
-	//	select {
-	//	case <-m.ctx.Done():
-	//		return
-	//	default:
-	//		m.loop2()
-	//	}
-	//}
+	for {
+		<-time.After(5 * time.Second)
+		select {
+		case <-m.ctx.Done():
+			return
+		default:
+			m.loop2()
+		}
+	}
 }
 
 func (m *Monitor) loop2() {
-	url := "%v/getTransactions?address=%v&limit=50&to_lt=0&archival=false"
+
+	//a1, _ := address.ParseAddr("EQA3MJp-9cU-UlnXAWl1RT18wtcieZT9HvAYRxwYgSjTYSub")
+	//a2, _ := address.ParseAddr("UQA3MJp-9cU-UlnXAWl1RT18wtcieZT9HvAYRxwYgSjTYXZe")
+	//a1.Equals(a2)
+
+	users, err := m.db.GetNormalUser()
+	if err != nil {
+		return
+	}
+	mp := make(map[string]*db.User, len(users))
+	for _, v := range users {
+		addr, err := address.ParseAddr(v.Address)
+		if err != nil {
+			continue
+		}
+		key := fmt.Sprintf("%v:%v", addr.Workchain(), hex.EncodeToString(addr.Data()))
+		mp[key] = v
+	}
+
+	url := "%v/getTransactions?address=%v&limit=100&to_lt=0&archival=false"
 	url = fmt.Sprintf(url, m.TonHost, m.AdminAddress)
 	resp, err := http.Get(url)
 	if err != nil {
@@ -73,14 +95,29 @@ func (m *Monitor) loop2() {
 	root := gjson.ParseBytes(bs)
 	if root.Get("ok").Bool() {
 
-		//txs := root.Get("result").Array()
+		txs := root.Get("result").Array()
 
-		//for _, tx := range txs {
-		//hash := tx.Get("transaction_id.hash").String()
-		//insource := tx.Get("in_msg.source").String()
-		//indestination := tx.Get("in_msg.destination").String()
-		//invalue := tx.Get("in_msg.value").String()
-		//}
+		for _, tx := range txs {
+			if len(tx.Get("out_msgs").Array()) == 0 {
+				hash := tx.Get("transaction_id.hash").String()
+				insource := tx.Get("in_msg.source").String()
+				a, err := address.ParseAddr(insource)
+				if err != nil {
+					continue
+				}
+
+				indestination := tx.Get("in_msg.destination").String()
+				invalue := tx.Get("in_msg.value").String()
+				m.log.Printf("workId:%v,addr:%v,sum:%v", a.Workchain(), base64.StdEncoding.EncodeToString(a.Data()), a.Checksum())
+				m.log.Printf("hash:%v,in.source:%v,in.destination:%v,in.value:%v \n", hash, insource, indestination, invalue)
+
+				key := fmt.Sprintf("%v:%v", a.Workchain(), hex.EncodeToString(a.Data()))
+				if u, ok := mp[key]; ok {
+					_ = m.db.UpdateUser(u.Address, 1, hash, invalue, time.Now().UTC().Add(10000*24*time.Hour))
+				}
+
+			}
+		}
 
 	}
 

@@ -7,10 +7,22 @@ import (
 	"log"
 	"testing"
 
+	"github.com/sunjiangjun/xlog"
+	"github.com/ton-server/mm-market-server/config"
 	"github.com/xssnick/tonutils-go/address"
 	"github.com/xssnick/tonutils-go/liteclient"
 	"github.com/xssnick/tonutils-go/ton"
 )
+
+func Init() *Monitor {
+	cfg := config.LoadConfig("../config.json")
+	return NewMonitor(cfg.DB, xlog.NewXLogger(), cfg.AdminAddress, cfg.TonHost, context.Background())
+}
+
+func TestLoop2(t *testing.T) {
+	m := Init()
+	m.loop2()
+}
 
 func TestMonitor_loop(t *testing.T) {
 	client := liteclient.NewConnectionPool()
