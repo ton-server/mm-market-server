@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+	"log"
 	"testing"
 	"time"
 
@@ -46,7 +47,7 @@ func TestDB_GetCoinWithCoinInfo(t *testing.T) {
 
 func TestDB_GetTxHistoryByAddress(t *testing.T) {
 	db := Init()
-	list, err := db.GetTxHistoryByAddress("0xabcdef1234567890abcdef1234567890abcdef12")
+	list, err := db.GetTxHistoryByAddress("UQClW8Jh_VKtWs9QO73enyYzLAHhQ-YTZjny2Kk20XAMf1Vt")
 	assert.NoError(t, err)
 	assert.Equal(t, "0xabcdef1234567890abcdef1234567890abcdef12", list[0].FromAddress)
 }
@@ -109,7 +110,6 @@ func TestDB_NewRecommendCoin(t *testing.T) {
 
 func TestDB_NewTxHistory(t *testing.T) {
 	txHistory := TxHistory{
-		Id:              1,
 		FromAddress:     "0xabcdef1234567890abcdef1234567890abcdef12",
 		ToAddress:       "0x1234567890abcdef1234567890abcdef12345678",
 		ContractAddress: "0xcontract1234567890abcdef1234567890abcdef",
@@ -117,8 +117,6 @@ func TestDB_NewTxHistory(t *testing.T) {
 		TxId:            "0xtransaction1234567890abcdef1234567890abcdef",
 		TxStatus:        1, // 成功
 		TxInfo:          "Transaction successful and confirmed.",
-		CreateTime:      time.Now(),
-		UpdateTime:      time.Now(),
 	}
 
 	b, _ := json.Marshal(txHistory)
@@ -155,4 +153,9 @@ func TestDB_UpdateUser(t *testing.T) {
 	db := Init()
 	err := db.UpdateUser("0x1234567890abcdef2", 2, "0xabcdef1234567890", "10000", time.Now().UTC().Add(1000*24*time.Hour))
 	assert.NoError(t, err)
+}
+
+func TestName(t *testing.T) {
+	log.Println(time.Now().Unix())
+	log.Println(time.Now().UTC().Unix())
 }

@@ -37,6 +37,7 @@ DROP TABLE IF EXISTS `table_recommend_coin`;
 CREATE TABLE `table_recommend_coin` (
                                         `id` bigint NOT NULL AUTO_INCREMENT,
                                         `uuid` varchar(255) NOT NULL,
+                                        `nick_name` varchar(255) DEFAULT NULL,
                                         `symbol` varchar(255) NOT NULL,
                                         `decimals` tinyint unsigned NOT NULL,
                                         `total_supply` varchar(255) NOT NULL,
@@ -47,7 +48,7 @@ CREATE TABLE `table_recommend_coin` (
                                         `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                                         PRIMARY KEY (`id`),
                                         UNIQUE KEY `uuid` (`uuid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Table structure for table_tx_history
