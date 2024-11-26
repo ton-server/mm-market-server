@@ -8,9 +8,53 @@ import (
 	"gorm.io/gorm"
 )
 
+const TimeFormat = "2006-01-02 15"
+
 type DB struct {
 	core *gorm.DB
 	log  *xlog.XLog
+}
+
+func (db *DB) NewTask(task *Task) error {
+	return db.core.Omit("id", "create_time", "update_time").Create(task).Error
+}
+
+func (db *DB) GetActiveTask() ([]*Task, error) {
+	var list []*Task
+	err := db.core.Model(Task{}).Where("active=? and expire_time>=?", 1, time.Now().UTC()).Scan(&list).Error
+	if err != nil {
+		return nil, err
+	}
+	return list, nil
+}
+
+func (db *DB) UpdateTask(address string, active int) error {
+	m := make(map[string]any, 1)
+	m["active"] = active
+	return db.core.Model(Task{}).Where("contract_address=?", address).Updates(m).Error
+}
+
+func (db *DB) NewCoinPrice(r *CoinPriceRecord) error {
+	return db.core.Omit("id", "create_time").Create(r).Error
+}
+
+func (db *DB) GetCoinPriceList(address string) (*CoinPriceRecord, *CoinPriceRecord, error) {
+	curr := time.Now().UTC().Format(TimeFormat)
+	pre := time.Now().Add(-24 * time.Hour).UTC().Format(TimeFormat)
+
+	var currentRecord CoinPriceRecord
+
+	err := db.core.Model(CoinPriceRecord{}).Where("contract_address=? and record_time=?", address, curr).Order("create_time desc").First(&currentRecord).Error
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var preRecord CoinPriceRecord
+	err = db.core.Model(CoinPriceRecord{}).Where("contract_address=? and record_time=?", address, pre).Order("create_time desc").First(&preRecord).Error
+	if err != nil {
+		return nil, nil, err
+	}
+	return &currentRecord, &preRecord, nil
 }
 
 func (db *DB) SubmitUser(u *User) error {

@@ -2,7 +2,6 @@ package db
 
 import (
 	"fmt"
-	"log"
 	"testing"
 	"time"
 
@@ -156,6 +155,36 @@ func TestDB_UpdateUser(t *testing.T) {
 }
 
 func TestName(t *testing.T) {
-	log.Println(time.Now().Unix())
-	log.Println(time.Now().UTC().Unix())
+	t.Log(time.Now().Unix())
+	t.Log(time.Now().UTC().Unix())
+}
+
+func TestDB_GetActiveTask(t *testing.T) {
+	db := Init()
+	list, err := db.GetActiveTask()
+	assert.NoError(t, err)
+	t.Logf("first.uuid:%v", list[0].UUID)
+}
+
+func TestDB_UpdateTask(t *testing.T) {
+	db := Init()
+	err := db.UpdateTask("EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs", 1)
+	assert.NoError(t, err)
+}
+
+func TestDB_NewCoinPrice(t *testing.T) {
+	db := Init()
+	err := db.NewCoinPrice(&CoinPriceRecord{
+		ContractAddress: "EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs",
+		Price:           "0.50",
+		RecordTime:      time.Now().Add(-24 * time.Hour).UTC().Format(TimeFormat),
+	})
+	assert.NoError(t, err)
+}
+
+func TestDB_GetCoinPriceList(t *testing.T) {
+	db := Init()
+	c, p, err := db.GetCoinPriceList("EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs")
+	assert.NoError(t, err)
+	t.Log(c, p)
 }

@@ -66,3 +66,30 @@ type TxHistory struct {
 func (r *TxHistory) TableName() string {
 	return "table_tx_history"
 }
+
+type Task struct {
+	Id              int64     `json:"id" gorm:"primary_key;auto_increment"`
+	UUID            string    `json:"uuid"  gorm:"column:uuid;unique"`
+	ContractAddress string    `json:"contractAddress" gorm:"column:contract_address"`
+	Rate            int8      `json:"rate" gorm:"column:rate"`     //1:时，2：分
+	Active          int8      `json:"active" gorm:"column:active"` //1:活跃 2：停止
+	ExpireTime      time.Time `json:"expireTime" gorm:"column:expire_time"`
+	CreateTime      time.Time `json:"createTime" gorm:"column:create_time"`
+	UpdateTime      time.Time `json:"updateTime" gorm:"column:update_time"`
+}
+
+func (r *Task) TableName() string {
+	return "table_task"
+}
+
+type CoinPriceRecord struct {
+	Id              int64     `json:"id" gorm:"primary_key;auto_increment"`
+	ContractAddress string    `json:"contractAddress" gorm:"column:contract_address"`
+	Price           string    `json:"price" gorm:"column:price"`
+	RecordTime      string    `json:"record_time" gorm:"column:record_time"`
+	CreateTime      time.Time `json:"createTime" gorm:"column:create_time"`
+}
+
+func (r *CoinPriceRecord) TableName() string {
+	return "table_coin_price"
+}

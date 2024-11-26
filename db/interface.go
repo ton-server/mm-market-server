@@ -19,4 +19,11 @@ type DBInterface interface {
 
 	NewTxHistory(tx *TxHistory) error
 	GetTxHistoryByAddress(address string) ([]*TxHistory, error)
+
+	NewTask(task *Task) error
+	GetActiveTask() ([]*Task, error)
+	UpdateTask(address string, active int) error
+
+	NewCoinPrice(r *CoinPriceRecord) error
+	GetCoinPriceList(address string) (current, pre *CoinPriceRecord, err error)
 }
