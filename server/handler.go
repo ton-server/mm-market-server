@@ -71,7 +71,7 @@ func (h *Handler) GetCoinList(ctx *gin.Context) {
 	}
 
 	for _, v := range list {
-		v.ExpireTime2 = v.ExpireTime.UTC().Unix()
+		v.ExpireTime2 = v.ExpireTime.Unix()
 	}
 
 	mp := make(map[string]any, 2)
@@ -88,7 +88,7 @@ func (h *Handler) GetCoin(ctx *gin.Context) {
 		h.Error(ctx, "", ctx.Request.RequestURI, err.Error())
 		return
 	}
-	r.ExpireTime2 = r.ExpireTime.UTC().Unix()
+	r.ExpireTime2 = r.ExpireTime.Unix()
 
 	h.Success(ctx, "", r, ctx.Request.RequestURI)
 }
@@ -113,7 +113,7 @@ func (h *Handler) GetTxHistory(ctx *gin.Context) {
 	}
 
 	for _, v := range list {
-		v.CreateTime2 = v.CreateTime.UTC().Unix()
+		v.CreateTime2 = v.CreateTime.Unix()
 	}
 
 	h.Success(ctx, "", list, ctx.Request.RequestURI)
@@ -199,7 +199,7 @@ func (h *Handler) GetUser(ctx *gin.Context) {
 		return
 	}
 
-	u.ExpireTime2 = u.ExpireTime.UTC().Unix()
+	u.ExpireTime2 = u.ExpireTime.Unix()
 	h.Success(ctx, "", u, ctx.Request.RequestURI)
 }
 

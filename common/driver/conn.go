@@ -21,7 +21,7 @@ func Open(user, password, addr, dbName string, port int, xlog *xlog.XLog) (*gorm
 		addr,
 		port,
 		dbName,
-		"Asia%2FShanghai")
+		"UTC")
 	//dsn := "user:pass@tcp(127.0.0.1:3306)/dbname?charset=utf8mb4&parseTime=True&loc=Local"
 
 	//PostgresSQL

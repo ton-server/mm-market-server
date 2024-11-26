@@ -60,13 +60,13 @@ CREATE TABLE `table_tx_history` (
                                     `to_address` varchar(255) NOT NULL,
                                     `contract_address` varchar(255) NOT NULL,
                                     `amount` varchar(255) NOT NULL,
-                                    `tx_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+                                    `tx_id` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
                                     `tx_status` tinyint unsigned NOT NULL DEFAULT '1' COMMENT '1:交易成功, 0:交易失败, 2:交易进行中',
                                     `tx_info` text,
                                     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                     `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                                     PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Table structure for table_user
