@@ -36,7 +36,7 @@ func main() {
 	monitor := server.NewMonitor(cfg.DB, LOG, cfg.AdminAddress, cfg.TonHost, ctx)
 	go monitor.Start()
 
-	gin.SetMode(gin.ReleaseMode)
+	//gin.SetMode(gin.ReleaseMode)
 
 	e := gin.New()
 	e.Use(CORSMiddleware())

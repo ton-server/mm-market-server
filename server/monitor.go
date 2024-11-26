@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"encoding/base64"
 	"encoding/hex"
 	"fmt"
 	"io"
@@ -47,6 +46,25 @@ func NewMonitor(cfg *config.DB, log *xlog.XLog, AdminAddress, TonHost string, ct
 }
 
 func (m *Monitor) Start() {
+	go m.stakeLoop()
+	go m.coinPriceLoop()
+}
+
+// stakeLoop 监听会员充值
+func (m *Monitor) coinPriceLoop() {
+	for {
+		<-time.After(20 * time.Minute)
+		select {
+		case <-m.ctx.Done():
+			return
+		default:
+			m.priceLoop()
+		}
+	}
+}
+
+// stakeLoop 监听会员充值
+func (m *Monitor) stakeLoop() {
 	for {
 		<-time.After(5 * time.Second)
 		select {
@@ -106,10 +124,10 @@ func (m *Monitor) loop2() {
 					continue
 				}
 
-				indestination := tx.Get("in_msg.destination").String()
+				//indestination := tx.Get("in_msg.destination").String()
 				invalue := tx.Get("in_msg.value").String()
-				m.log.Printf("workId:%v,addr:%v,sum:%v", a.Workchain(), base64.StdEncoding.EncodeToString(a.Data()), a.Checksum())
-				m.log.Printf("hash:%v,in.source:%v,in.destination:%v,in.value:%v \n", hash, insource, indestination, invalue)
+				//m.log.Printf("workId:%v,addr:%v,sum:%v", a.Workchain(), base64.StdEncoding.EncodeToString(a.Data()), a.Checksum())
+				//m.log.Printf("hash:%v,in.source:%v,in.destination:%v,in.value:%v \n", hash, insource, indestination, invalue)
 
 				key := fmt.Sprintf("%v:%v", a.Workchain(), hex.EncodeToString(a.Data()))
 				if u, ok := mp[key]; ok {
@@ -180,4 +198,53 @@ func (m *Monitor) loop() {
 	for _, tx := range transactions {
 		fmt.Printf("LT: %v, Hash: %s, Value: %s TON\n", tx.LT, tx.Hash, tx.String())
 	}
+}
+
+func (m *Monitor) priceLoop() {
+
+	list, err := m.db.GetActiveTask()
+	if err != nil {
+		return
+	}
+
+	for _, v := range list {
+		addr := v.ContractAddress
+		//r:=v.Rate
+		price, err := GetPrice(addr)
+		if err != nil {
+			continue
+		}
+
+		err = m.db.NewCoinPrice(&db.CoinPriceRecord{
+			ContractAddress: addr,
+			Price:           price,
+			RecordTime:      time.Now().UTC().Format(db.TimeFormat),
+		})
+		if err != nil {
+			continue
+		}
+
+	}
+
+}
+
+func GetPrice(address string) (string, error) {
+	//https://api.ston.fi/v1/assets/EQAvlWFDxGF2lXm67y4yzC17wYKD9A0guwPkMs1gOsM__NOT
+
+	url := fmt.Sprintf("https://api.ston.fi/v1/assets/%v", address)
+	resp, err := http.Get(url)
+	if err != nil {
+		return "", nil
+	}
+
+	bs, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", nil
+	}
+
+	defer resp.Body.Close()
+
+	root := gjson.ParseBytes(bs)
+	price := root.Get("asset.dex_usd_price").String()
+	return price, nil
 }

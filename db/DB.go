@@ -39,12 +39,12 @@ func (db *DB) NewCoinPrice(r *CoinPriceRecord) error {
 }
 
 func (db *DB) GetCoinPriceList(address string) (*CoinPriceRecord, *CoinPriceRecord, error) {
-	curr := time.Now().UTC().Format(TimeFormat)
+	//curr := time.Now().UTC().Format(TimeFormat)
 	pre := time.Now().Add(-24 * time.Hour).UTC().Format(TimeFormat)
 
 	var currentRecord CoinPriceRecord
 
-	err := db.core.Model(CoinPriceRecord{}).Where("contract_address=? and record_time=?", address, curr).Order("create_time desc").First(&currentRecord).Error
+	err := db.core.Model(CoinPriceRecord{}).Where("contract_address=?", address).Order("create_time desc").First(&currentRecord).Error
 	if err != nil {
 		return nil, nil, err
 	}
@@ -52,7 +52,7 @@ func (db *DB) GetCoinPriceList(address string) (*CoinPriceRecord, *CoinPriceReco
 	var preRecord CoinPriceRecord
 	err = db.core.Model(CoinPriceRecord{}).Where("contract_address=? and record_time=?", address, pre).Order("create_time desc").First(&preRecord).Error
 	if err != nil {
-		return nil, nil, err
+		return &currentRecord, nil, nil
 	}
 	return &currentRecord, &preRecord, nil
 }
@@ -74,7 +74,7 @@ func (db *DB) UpdateUser(address string, role int, stakeTx string, stakeAmount s
 
 func (db *DB) GetNormalUser() ([]*User, error) {
 	var list []*User
-	err := db.core.Model(User{}).Where("role=?", 0).Scan(&list).Error
+	err := db.core.Model(User{}).Where("role=? or expire_time<?", 0, time.Now().UTC()).Scan(&list).Error
 	if err != nil {
 		return nil, err
 	}
@@ -107,6 +107,16 @@ func (db *DB) NewRecommendCoinAndCoinInfo(rc *RecommendCoin) error {
 	if err != nil {
 		return err
 	}
+
+	err = db.NewTask(&Task{
+		UUID:            rc.UUID,
+		ContractAddress: rc.ContractAddress,
+		ExpireTime:      rc.ExpireTime,
+	})
+	if err != nil {
+		return err
+	}
+
 	err = db.NewRecommendCoin(rc)
 	if err != nil {
 		return err

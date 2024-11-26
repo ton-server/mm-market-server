@@ -24,6 +24,11 @@ func TestLoop2(t *testing.T) {
 	m.loop2()
 }
 
+func TestPriceLoop(t *testing.T) {
+	m := Init()
+	m.priceLoop()
+}
+
 func TestMonitor_loop(t *testing.T) {
 	client := liteclient.NewConnectionPool()
 

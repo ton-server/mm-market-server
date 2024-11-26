@@ -188,3 +188,10 @@ func TestDB_GetCoinPriceList(t *testing.T) {
 	assert.NoError(t, err)
 	t.Log(c, p)
 }
+
+func TestDB_GetNormalUser(t *testing.T) {
+	db := Init()
+	list, err := db.GetNormalUser()
+	assert.NoError(t, err)
+	t.Log(len(list))
+}

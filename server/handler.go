@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"strconv"
 	"strings"
@@ -11,12 +12,9 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/sunjiangjun/xlog"
 	"github.com/ton-server/mm-market-server/common/driver"
+	"github.com/ton-server/mm-market-server/common/util"
 	"github.com/ton-server/mm-market-server/config"
 	"github.com/ton-server/mm-market-server/db"
-)
-
-const (
-	TimeFormat = "2006-01-02 15:04:05"
 )
 
 type Handler struct {
@@ -72,6 +70,21 @@ func (h *Handler) GetCoinList(ctx *gin.Context) {
 
 	for _, v := range list {
 		v.ExpireTime2 = v.ExpireTime.Unix()
+
+		c, p, err := h.db.GetCoinPriceList(v.ContractAddress)
+		if err != nil {
+			continue
+		}
+		v.Usd = c.Price
+		if p == nil {
+			v.Change = "--"
+		} else {
+			ch, err := util.CalculatePercentageChange(p.Price, c.Price)
+			if err != nil {
+				continue
+			}
+			v.Change = fmt.Sprintf("%.2f%%", ch)
+		}
 	}
 
 	mp := make(map[string]any, 2)
