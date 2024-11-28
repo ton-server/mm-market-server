@@ -102,6 +102,22 @@ func (h *Handler) GetCoin(ctx *gin.Context) {
 		return
 	}
 	r.ExpireTime2 = r.ExpireTime.Unix()
+	c, p, err := h.db.GetCoinPriceList(r.ContractAddress)
+	if err != nil {
+		h.Error(ctx, "", ctx.Request.RequestURI, err.Error())
+		return
+	}
+	r.Usd = c.Price
+	if p == nil {
+		r.Change = "--"
+	} else {
+		ch, err := util.CalculatePercentageChange(p.Price, c.Price)
+		if err != nil {
+			h.Error(ctx, "", ctx.Request.RequestURI, err.Error())
+			return
+		}
+		r.Change = fmt.Sprintf("%.2f%%", ch)
+	}
 
 	h.Success(ctx, "", r, ctx.Request.RequestURI)
 }

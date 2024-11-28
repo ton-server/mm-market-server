@@ -131,7 +131,7 @@ func (m *Monitor) loop2() {
 
 				key := fmt.Sprintf("%v:%v", a.Workchain(), hex.EncodeToString(a.Data()))
 				if u, ok := mp[key]; ok {
-					_ = m.db.UpdateUser(u.Address, 1, hash, invalue, time.Now().UTC().Add(10000*24*time.Hour))
+					_ = m.db.UpdateUser(u.Address, 1, hash, invalue, time.Now().UTC().Add(30*24*time.Hour))
 				}
 
 			}
