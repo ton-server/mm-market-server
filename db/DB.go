@@ -63,13 +63,14 @@ func (db *DB) SubmitUser(u *User) error {
 	return db.core.Omit("id", "create_time", "update_time").Create(u).Error
 }
 
-func (db *DB) UpdateUser(address string, role int, stakeTx string, stakeAmount string, expireTime time.Time) error {
+func (db *DB) UpdateUser(address string, role int, stakeTx string, stakeAmount string, expireTime time.Time, utime int64) error {
 	m := make(map[string]any, 4)
 	m["role"] = role
 	m["stake_tx"] = stakeTx
 	m["stake_amount"] = stakeAmount
 	m["expire_time"] = expireTime
-	return db.core.Model(User{}).Where("address=?", address).Updates(m).Error
+	m["utime"] = utime
+	return db.core.Model(User{}).Where("address=? and utime<?", address, utime).Updates(m).Error
 }
 
 func (db *DB) GetNormalUser() ([]*User, error) {

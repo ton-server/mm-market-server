@@ -4,7 +4,7 @@ import "time"
 
 type DBInterface interface {
 	SubmitUser(u *User) error
-	UpdateUser(address string, role int, stakeTx string, stakeAmount string, expireTime time.Time) error
+	UpdateUser(address string, role int, stakeTx string, stakeAmount string, expireTime time.Time, utime int64) error
 	GetUser(address string) (*User, error)
 	GetNormalUser() ([]*User, error)
 

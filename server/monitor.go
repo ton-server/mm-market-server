@@ -118,6 +118,7 @@ func (m *Monitor) loop2() {
 		for _, tx := range txs {
 			if len(tx.Get("out_msgs").Array()) == 0 {
 				hash := tx.Get("transaction_id.hash").String()
+				utime := tx.Get("utime").Int()
 				insource := tx.Get("in_msg.source").String()
 				a, err := address.ParseAddr(insource)
 				if err != nil {
@@ -131,7 +132,7 @@ func (m *Monitor) loop2() {
 
 				key := fmt.Sprintf("%v:%v", a.Workchain(), hex.EncodeToString(a.Data()))
 				if u, ok := mp[key]; ok {
-					_ = m.db.UpdateUser(u.Address, 1, hash, invalue, time.Now().UTC().Add(30*24*time.Hour))
+					_ = m.db.UpdateUser(u.Address, 1, hash, invalue, time.Now().UTC().Add(30*24*time.Hour), utime)
 				}
 
 			}

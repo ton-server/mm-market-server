@@ -86,13 +86,14 @@ CREATE TABLE `table_user`
     `role`         int          NOT NULL DEFAULT '0' COMMENT '1:vip, 0:normal, 2:ing',
     `stake_tx`     varchar(255)          DEFAULT NULL,
     `stake_amount` varchar(255)          DEFAULT NULL,
+    `utime`        bigint                DEFAULT '0',
     `expire_time`  datetime              DEFAULT NULL,
     `create_time`  datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `update_time`  datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     UNIQUE KEY `address` (`address`),
     KEY            `role` (`role`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
 DROP TABLE IF EXISTS `table_task`;

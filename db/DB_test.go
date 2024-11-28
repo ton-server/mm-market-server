@@ -150,7 +150,7 @@ func TestDB_SubmitUser(t *testing.T) {
 
 func TestDB_UpdateUser(t *testing.T) {
 	db := Init()
-	err := db.UpdateUser("0x1234567890abcdef2", 2, "0xabcdef1234567890", "10000", time.Now().UTC().Add(1000*24*time.Hour))
+	err := db.UpdateUser("0x1234567890abcdef2", 2, "0xabcdef1234567890", "10000", time.Now().UTC().Add(1000*24*time.Hour), time.Now().Unix())
 	assert.NoError(t, err)
 }
 

@@ -10,6 +10,7 @@ type User struct {
 	StakeTx     string    `json:"stakeTx" gorm:"column:stake_tx"`
 	StakeAmount string    `json:"stakeAmount" gorm:"column:stake_amount"`
 	ExpireTime  time.Time `json:"expireTime" gorm:"column:expire_time"`
+	Utime       int64     `json:"utime" gorm:"column:utime"`
 	ExpireTime2 int64     `json:"expireTime2" gorm:"-"`
 	CreateTime  time.Time `json:"createTime" gorm:"column:create_time"`
 	UpdateTime  time.Time `json:"updateTime" gorm:"column:update_time"`

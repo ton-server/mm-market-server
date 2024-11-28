@@ -11,7 +11,7 @@
     "Path": "./log/market",
     "Delay": 2
   },
-  "AdminAddress": "UQA3MJp-9cU-UlnXAWl1RT18wtcieZT9HvAYRxwYgSjTYXZe",
+  "AdminAddress": "UQClW8Jh_VKtWs9QO73enyYzLAHhQ-YTZjny2Kk20XAMf1Vt",
   "TonHost": "https://toncenter.com/api/v2",
   "Root": "./market"
 }
